@@ -527,7 +527,7 @@
           <span id="gh-star-count">21</span>
         </a>
         <a class="btn btn-light small" href="https://lind-project.github.io/lind-wasm/" target="_blank" rel="noopener">Docs</a>
-        <a class="btn btn-dark small" href="https://lind-project.github.io/lind-wasm/" target="_blank" rel="noopener">Get started</a>
+        <a class="btn btn-dark small" href="https://lind-project.github.io/lind-wasm/getting-started/" target="_blank" rel="noopener">Get started</a>
       </div>
     </div>
   </nav>
@@ -543,9 +543,9 @@
 
     <div class="chip-row">
       <span class="chip"><span class="dot" style="background:#654ff0"></span>WebAssembly</span>
-      <span class="chip-plus">+</span>
+      <span class="chip-plus">/</span>
       <span class="chip"><span class="dot" style="background:#0068b5"></span>Intel MPK</span>
-      <span class="chip-plus">+</span>
+      <span class="chip-plus">/</span>
       <span class="chip"><span class="dot" style="background:#2f7a3d"></span>Kernel backends</span>
       <span class="chip-plus">→</span>
       <span class="chip">One mediation layer: 3i</span>
@@ -561,59 +561,65 @@
 
   <div class="arch" id="architecture">
     <div class="arch-frame">
-      <svg viewBox="0 0 840 430" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" role="img" aria-label="Lind architecture: cages route system calls through 3i to grates and RawPOSIX, on top of pluggable isolation backends">
-        <!-- Cages -->
+      <svg viewBox="0 0 860 392" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" role="img" aria-label="Lind architecture: cages and grates run inside a pluggable isolation backend that confines them; each cage sends system calls downward into 3i; grates exchange calls with 3i in both directions; 3i services calls through the trusted RawPOSIX runtime.">
+        <!-- Isolation backend: frame around cages & grates -->
+        <rect x="16" y="14" width="828" height="158" rx="18" fill="#efe9df" stroke="#d9d2c6"/>
+        <text x="34" y="39" font-size="11" font-weight="700" letter-spacing="0.06em" fill="#8a857c">PLUGGABLE ISOLATION BACKEND · CONFINES CAGES &amp; GRATES</text>
+        <text x="826" y="39" text-anchor="end" font-size="11" fill="#55524c">WebAssembly / Wasmtime ✓ · Intel MPK (planned) · Kernel (planned)</text>
+
+        <!-- Cages (isolated, only downward arrows) -->
         <g>
-          <rect x="20" y="20" width="250" height="92" rx="14" fill="#f5f1ea" stroke="#e2dcd1"/>
-          <text x="145" y="55" text-anchor="middle" font-size="17" font-weight="700" fill="#1a1a1a">Cage 1</text>
-          <text x="145" y="80" text-anchor="middle" font-size="13" fill="#55524c">NGINX</text>
+          <rect x="32" y="56" width="187" height="92" rx="13" fill="#fff" stroke="#e2dcd1"/>
+          <text x="125.5" y="96" text-anchor="middle" font-size="16.5" font-weight="700" fill="#1a1a1a">Cage 1</text>
+          <text x="125.5" y="120" text-anchor="middle" font-size="12.5" fill="#55524c">NGINX</text>
 
-          <rect x="295" y="20" width="250" height="92" rx="14" fill="#f5f1ea" stroke="#e2dcd1"/>
-          <text x="420" y="55" text-anchor="middle" font-size="17" font-weight="700" fill="#1a1a1a">Cage 2</text>
-          <text x="420" y="80" text-anchor="middle" font-size="13" fill="#55524c">PostgreSQL</text>
+          <rect x="235" y="56" width="187" height="92" rx="13" fill="#fff" stroke="#e2dcd1"/>
+          <text x="328.5" y="96" text-anchor="middle" font-size="16.5" font-weight="700" fill="#1a1a1a">Cage 2</text>
+          <text x="328.5" y="120" text-anchor="middle" font-size="12.5" fill="#55524c">PostgreSQL</text>
 
-          <rect x="570" y="20" width="250" height="92" rx="14" fill="#f5f1ea" stroke="#e2dcd1"/>
-          <text x="695" y="55" text-anchor="middle" font-size="17" font-weight="700" fill="#1a1a1a">Cage 3</text>
-          <text x="695" y="80" text-anchor="middle" font-size="13" fill="#55524c">Python</text>
+          <rect x="438" y="56" width="187" height="92" rx="13" fill="#fff" stroke="#e2dcd1"/>
+          <text x="531.5" y="96" text-anchor="middle" font-size="16.5" font-weight="700" fill="#1a1a1a">Cage 3</text>
+          <text x="531.5" y="120" text-anchor="middle" font-size="12.5" fill="#55524c">Python</text>
         </g>
 
-        <!-- Arrows down to 3i -->
+        <!-- Grate (isolated, sits with the cages; exchanges calls with 3i) -->
+        <rect x="641" y="56" width="187" height="92" rx="13" fill="#fff" stroke="#c9a24b" stroke-width="1.6"/>
+        <text x="734.5" y="96" text-anchor="middle" font-size="16.5" font-weight="700" fill="#1a1a1a">Grate</text>
+        <text x="734.5" y="120" text-anchor="middle" font-size="12" fill="#55524c">user-space policy handler</text>
+
+        <!-- Cages: system calls, only downward into 3i -->
         <g stroke="#8a857c" stroke-width="2" fill="none">
-          <path d="M145 112 v36"/><path d="M420 112 v36"/><path d="M695 112 v36"/>
+          <path d="M125.5 148 v60"/><path d="M328.5 148 v60"/><path d="M531.5 148 v60"/>
         </g>
         <g fill="#8a857c">
-          <path d="M145 154 l-5 -8 h10 z"/><path d="M420 154 l-5 -8 h10 z"/><path d="M695 154 l-5 -8 h10 z"/>
+          <path d="M125.5 210 l-5 -8 h10 z"/><path d="M328.5 210 l-5 -8 h10 z"/><path d="M531.5 210 l-5 -8 h10 z"/>
         </g>
-        <text x="470" y="140" font-size="12" fill="#8a857c">system calls</text>
+        <text x="430" y="184" text-anchor="middle" font-size="12" fill="#8a857c">system calls</text>
+
+        <!-- Grate ↔ 3i, both directions -->
+        <g stroke="#8a857c" stroke-width="2" fill="none">
+          <path d="M722 148 v60"/><path d="M748 210 v-60"/>
+        </g>
+        <g fill="#8a857c">
+          <path d="M722 210 l-5 -8 h10 z"/><path d="M748 150 l-5 8 h10 z"/>
+        </g>
+        <text x="762" y="184" text-anchor="start" font-size="12" fill="#8a857c">mediation</text>
 
         <!-- 3i -->
-        <rect x="20" y="156" width="800" height="64" rx="14" fill="#1a1a1a"/>
-        <text x="420" y="184" text-anchor="middle" font-size="16" font-weight="700" fill="#f5f1ea">3i — Intercage Interposition Interface</text>
-        <text x="420" y="205" text-anchor="middle" font-size="12.5" fill="#cfc9bd">uniform system-call mediation, routing &amp; policy</text>
+        <rect x="16" y="212" width="828" height="64" rx="14" fill="#1a1a1a"/>
+        <text x="430" y="242" text-anchor="middle" font-size="15.5" font-weight="700" fill="#f5f1ea">3i — Intercage Interposition Interface</text>
+        <text x="430" y="262" text-anchor="middle" font-size="12" fill="#cfc9bd">uniform system-call mediation, routing &amp; policy</text>
 
-        <!-- Arrows to grates / rawposix -->
+        <!-- 3i services calls via RawPOSIX -->
         <g stroke="#8a857c" stroke-width="2" fill="none">
-          <path d="M225 220 v36"/><path d="M615 220 v36"/>
+          <path d="M430 276 v34"/>
         </g>
-        <g fill="#8a857c">
-          <path d="M225 262 l-5 -8 h10 z"/><path d="M615 262 l-5 -8 h10 z"/>
-        </g>
+        <path d="M430 314 l-5 -8 h10 z" fill="#8a857c"/>
 
-        <!-- Grates + RawPOSIX -->
-        <rect x="20" y="264" width="410" height="72" rx="14" fill="#fff" stroke="#e2dcd1"/>
-        <text x="225" y="294" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">Grates</text>
-        <text x="225" y="316" text-anchor="middle" font-size="12.5" fill="#55524c">user-space policy handlers</text>
-
-        <rect x="450" y="264" width="370" height="72" rx="14" fill="#fff" stroke="#e2dcd1"/>
-        <text x="635" y="294" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">RawPOSIX</text>
-        <text x="635" y="316" text-anchor="middle" font-size="12.5" fill="#55524c">minimal trusted POSIX runtime</text>
-
-        <!-- Backend layer -->
-        <rect x="20" y="356" width="800" height="56" rx="14" fill="#efe9df" stroke="#e2dcd1"/>
-        <text x="45" y="389" font-size="13.5" font-weight="700" fill="#1a1a1a">Pluggable isolation backends:</text>
-        <text x="295" y="389" font-size="13.5" fill="#55524c">WebAssembly / Wasmtime ✓</text>
-        <text x="530" y="389" font-size="13.5" fill="#8a857c">Intel MPK (planned)</text>
-        <text x="695" y="389" font-size="13.5" fill="#8a857c">Kernel (planned)</text>
+        <!-- RawPOSIX (trusted) -->
+        <rect x="16" y="316" width="828" height="60" rx="14" fill="#fff" stroke="#e2dcd1"/>
+        <text x="430" y="344" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">RawPOSIX</text>
+        <text x="430" y="363" text-anchor="middle" font-size="12" fill="#55524c">minimal trusted POSIX runtime</text>
       </svg>
     </div>
   </div>
