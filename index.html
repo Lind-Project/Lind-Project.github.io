@@ -1,10 +1,679 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="refresh" content="0; url=https://lind-project.github.io/lind-wasm">
-    <title>Redirecting...</title>
-  </head>
-  <body>
-    <p>If not redirected automatically, go to <a href="https://lind-project.github.io/lind-wasm">lind-project.github.io/lind-wasm</a>.</p>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lind — Safely run untrusted POSIX applications</title>
+  <meta name="description" content="Lind is a general framework for safely executing untrusted POSIX applications as isolated cages within a single unprivileged host process.">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <style>
+    :root {
+      --bg: #f5f1ea;
+      --bg-soft: #efe9df;
+      --card: #ffffff;
+      --ink: #1a1a1a;
+      --ink-soft: #55524c;
+      --ink-faint: #8a857c;
+      --line: #e2dcd1;
+      --accent: #1a1a1a;
+      --radius-lg: 20px;
+      --radius-pill: 999px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ---------- Nav ---------- */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(245, 241, 234, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid transparent;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 24px;
+      max-width: 1240px;
+      margin: 0 auto;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+    .brand img {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      display: block;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-links a.plain {
+      padding: 8px 14px;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      border-radius: var(--radius-pill);
+    }
+    .nav-links a.plain:hover { color: var(--ink); }
+    @media (max-width: 900px) {
+      .nav-links a.plain { display: none; }
+    }
+    @media (max-width: 480px) {
+      .nav-inner { flex-wrap: wrap; justify-content: center; gap: 10px; }
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-dark {
+      background: var(--ink);
+      color: var(--bg);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    }
+    .btn-dark:hover { box-shadow: 0 6px 18px rgba(0,0,0,0.18); }
+    .btn-light {
+      background: var(--card);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+    .btn-light:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+    .btn.small { padding: 9px 16px; font-size: 14px; }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      text-align: center;
+      padding: 72px 24px 64px;
+    }
+    .hero-logo {
+      width: 110px;
+      height: auto;
+      margin: 0 auto 28px;
+      display: block;
+      filter: drop-shadow(0 10px 24px rgba(60, 50, 30, 0.18));
+    }
+    .hero h1 {
+      font-size: clamp(40px, 6.5vw, 76px);
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.05;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .hero .sub {
+      margin: 28px auto 0;
+      max-width: 720px;
+      font-size: 19px;
+      color: var(--ink-soft);
+    }
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      margin-top: 36px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      padding: 10px 20px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    .chip .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .chip-plus { color: var(--ink-faint); font-size: 18px; font-weight: 500; }
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 44px;
+    }
+    .hero-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 26px;
+      background: var(--bg-soft);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 18px;
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 14px;
+      color: var(--ink-soft);
+    }
+
+    /* ---------- Architecture diagram ---------- */
+    .arch {
+      padding: 24px 24px 40px;
+    }
+    .arch-frame {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 60px rgba(60, 50, 30, 0.10);
+      padding: 30px;
+    }
+    .arch-frame svg { width: 100%; height: auto; display: block; }
+
+    /* ---------- Sections ---------- */
+    section { padding: 72px 0; }
+    .kicker {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-faint);
+      margin-bottom: 14px;
+    }
+    h2.section-title {
+      font-size: clamp(30px, 4vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.12;
+      max-width: 760px;
+    }
+    .section-lede {
+      margin-top: 18px;
+      max-width: 720px;
+      font-size: 17px;
+      color: var(--ink-soft);
+    }
+
+    .grid {
+      display: grid;
+      gap: 20px;
+      margin-top: 44px;
+    }
+    .grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+    @media (max-width: 900px) {
+      .grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+      .grid.cols-4, .grid.cols-2 { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 34px rgba(60, 50, 30, 0.10);
+    }
+    .card .icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--bg-soft);
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      font-size: 19px;
+      margin-bottom: 16px;
+    }
+    .card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 8px;
+    }
+    .card p {
+      font-size: 15px;
+      color: var(--ink-soft);
+    }
+    .card .mono {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 13px;
+      color: var(--ink-faint);
+    }
+
+    /* ---------- Projects ---------- */
+    .projects { background: var(--bg-soft); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .project-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .project-card.featured {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 36px;
+      align-items: center;
+      padding: 38px;
+    }
+    @media (max-width: 800px) {
+      .project-card.featured { grid-template-columns: 1fr; }
+    }
+    .badge {
+      display: inline-flex;
+      align-self: flex-start;
+      align-items: center;
+      gap: 7px;
+      border-radius: var(--radius-pill);
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--ink);
+      color: var(--bg);
+      width: fit-content;
+    }
+    .badge.soft {
+      background: var(--bg-soft);
+      color: var(--ink-soft);
+      border: 1px solid var(--line);
+    }
+    .project-card h3 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .project-card.featured p { font-size: 16px; color: var(--ink-soft); }
+    .project-links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+    .stack-list {
+      background: var(--bg);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px;
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 14px;
+    }
+    .stack-list .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 9px 4px;
+      border-bottom: 1px dashed var(--line);
+    }
+    .stack-list .row:last-child { border-bottom: none; }
+    .stack-list .ok { color: #2f7a3d; font-weight: 700; }
+
+    /* ---------- Roadmap ---------- */
+    .timeline {
+      margin-top: 44px;
+      display: grid;
+      gap: 0;
+    }
+    .tl-item {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 24px;
+      padding: 22px 0;
+      border-top: 1px solid var(--line);
+    }
+    .tl-item:last-child { border-bottom: 1px solid var(--line); }
+    .tl-when {
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+    }
+    .tl-when .sub {
+      display: block;
+      font-weight: 500;
+      font-size: 13px;
+      color: var(--ink-faint);
+    }
+    .tl-body { font-size: 15px; color: var(--ink-soft); max-width: 780px; }
+    .tl-body strong { color: var(--ink); }
+    @media (max-width: 600px) {
+      .tl-item { grid-template-columns: 1fr; gap: 6px; }
+    }
+
+    /* ---------- CTA band ---------- */
+    .cta-band {
+      background: var(--ink);
+      color: var(--bg);
+      border-radius: var(--radius-lg);
+      padding: 56px 40px;
+      text-align: center;
+      margin: 40px 0 8px;
+    }
+    .cta-band h2 {
+      font-size: clamp(26px, 3.6vw, 40px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .cta-band p {
+      margin: 14px auto 0;
+      max-width: 620px;
+      color: #cfc9bd;
+      font-size: 16px;
+    }
+    .cta-band .hero-cta { margin-top: 32px; }
+    .cta-band .btn-light { border: none; }
+
+    /* ---------- Footer ---------- */
+    footer {
+      padding: 48px 0 56px;
+      color: var(--ink-faint);
+      font-size: 14px;
+    }
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 20px; }
+    .footer-links a:hover { color: var(--ink); }
+
+    .gh-icon { width: 18px; height: 18px; fill: currentColor; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a class="brand" href="#">
+        <img src="assets/lind-logo.png" alt="Lind logo">
+        Lind
+      </a>
+      <div class="nav-links">
+        <a class="plain" href="#architecture">Architecture</a>
+        <a class="plain" href="#projects">Projects</a>
+        <a class="plain" href="#roadmap">Roadmap</a>
+        <a class="btn btn-light small" href="https://github.com/Lind-Project" target="_blank" rel="noopener">
+          <svg class="gh-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+        <a class="btn btn-dark small" href="https://lind-project.github.io/lind-wasm/" target="_blank" rel="noopener">Get started with lind-wasm</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <img class="hero-logo" src="assets/lind-logo.png" alt="" aria-hidden="true">
+    <h1>Run untrusted POSIX applications, safely, in one process</h1>
+    <p class="sub">
+      Lind executes untrusted POSIX applications as isolated <strong>cages</strong> inside a single
+      unprivileged host process — no kernel modifications, no elevated privileges — while keeping
+      the isolation mechanism pluggable and the system-call policy layer uniform.
+    </p>
+
+    <div class="chip-row">
+      <span class="chip"><span class="dot" style="background:#654ff0"></span>WebAssembly</span>
+      <span class="chip-plus">+</span>
+      <span class="chip"><span class="dot" style="background:#0068b5"></span>Intel MPK</span>
+      <span class="chip-plus">+</span>
+      <span class="chip"><span class="dot" style="background:#2f7a3d"></span>Kernel backends</span>
+      <span class="chip-plus">→</span>
+      <span class="chip">One mediation layer: 3i</span>
+    </div>
+
+    <div class="hero-cta">
+      <a class="btn btn-dark" href="https://lind-project.github.io/lind-wasm/" target="_blank" rel="noopener">Explore lind-wasm ↗</a>
+      <a class="btn btn-light" href="https://github.com/Lind-Project/lind-wasm" target="_blank" rel="noopener">View on GitHub</a>
+    </div>
+
+    <div class="hero-note">$ recompile · sandbox · run — most C/POSIX programs, unchanged</div>
+  </header>
+
+  <div class="arch" id="architecture">
+    <div class="arch-frame">
+      <svg viewBox="0 0 840 430" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" role="img" aria-label="Lind architecture: cages route system calls through 3i to grates and RawPOSIX, on top of pluggable isolation backends">
+        <!-- Cages -->
+        <g>
+          <rect x="20" y="20" width="250" height="92" rx="14" fill="#f5f1ea" stroke="#e2dcd1"/>
+          <text x="145" y="55" text-anchor="middle" font-size="17" font-weight="700" fill="#1a1a1a">Cage 1</text>
+          <text x="145" y="80" text-anchor="middle" font-size="13" fill="#55524c">NGINX</text>
+
+          <rect x="295" y="20" width="250" height="92" rx="14" fill="#f5f1ea" stroke="#e2dcd1"/>
+          <text x="420" y="55" text-anchor="middle" font-size="17" font-weight="700" fill="#1a1a1a">Cage 2</text>
+          <text x="420" y="80" text-anchor="middle" font-size="13" fill="#55524c">PostgreSQL</text>
+
+          <rect x="570" y="20" width="250" height="92" rx="14" fill="#f5f1ea" stroke="#e2dcd1"/>
+          <text x="695" y="55" text-anchor="middle" font-size="17" font-weight="700" fill="#1a1a1a">Cage 3</text>
+          <text x="695" y="80" text-anchor="middle" font-size="13" fill="#55524c">Python</text>
+        </g>
+
+        <!-- Arrows down to 3i -->
+        <g stroke="#8a857c" stroke-width="2" fill="none">
+          <path d="M145 112 v36"/><path d="M420 112 v36"/><path d="M695 112 v36"/>
+        </g>
+        <g fill="#8a857c">
+          <path d="M145 154 l-5 -8 h10 z"/><path d="M420 154 l-5 -8 h10 z"/><path d="M695 154 l-5 -8 h10 z"/>
+        </g>
+        <text x="470" y="140" font-size="12" fill="#8a857c">system calls</text>
+
+        <!-- 3i -->
+        <rect x="20" y="156" width="800" height="64" rx="14" fill="#1a1a1a"/>
+        <text x="420" y="184" text-anchor="middle" font-size="16" font-weight="700" fill="#f5f1ea">3i — Intercage Interposition Interface</text>
+        <text x="420" y="205" text-anchor="middle" font-size="12.5" fill="#cfc9bd">uniform system-call mediation, routing &amp; policy</text>
+
+        <!-- Arrows to grates / rawposix -->
+        <g stroke="#8a857c" stroke-width="2" fill="none">
+          <path d="M225 220 v36"/><path d="M615 220 v36"/>
+        </g>
+        <g fill="#8a857c">
+          <path d="M225 262 l-5 -8 h10 z"/><path d="M615 262 l-5 -8 h10 z"/>
+        </g>
+
+        <!-- Grates + RawPOSIX -->
+        <rect x="20" y="264" width="410" height="72" rx="14" fill="#fff" stroke="#e2dcd1"/>
+        <text x="225" y="294" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">Grates</text>
+        <text x="225" y="316" text-anchor="middle" font-size="12.5" fill="#55524c">user-space policy handlers</text>
+
+        <rect x="450" y="264" width="370" height="72" rx="14" fill="#fff" stroke="#e2dcd1"/>
+        <text x="635" y="294" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">RawPOSIX</text>
+        <text x="635" y="316" text-anchor="middle" font-size="12.5" fill="#55524c">minimal trusted POSIX runtime</text>
+
+        <!-- Backend layer -->
+        <rect x="20" y="356" width="800" height="56" rx="14" fill="#efe9df" stroke="#e2dcd1"/>
+        <text x="45" y="389" font-size="13.5" font-weight="700" fill="#1a1a1a">Pluggable isolation backends:</text>
+        <text x="295" y="389" font-size="13.5" fill="#55524c">WebAssembly / Wasmtime ✓</text>
+        <text x="530" y="389" font-size="13.5" fill="#8a857c">Intel MPK (planned)</text>
+        <text x="695" y="389" font-size="13.5" fill="#8a857c">Kernel (planned)</text>
+      </svg>
+    </div>
+  </div>
+
+  <section class="wrap" id="concepts">
+    <div class="kicker">Why Lind</div>
+    <h2 class="section-title">Isolation and policy, finally decoupled</h2>
+    <p class="section-lede">
+      Sandboxes usually entangle two concerns: <em>how</em> an application is confined, and <em>how</em> its
+      system calls are mediated. Lind separates them cleanly — so isolation technology can evolve
+      without rewriting policy, and policy can be composed without touching the isolation substrate.
+    </p>
+
+    <div class="grid cols-4">
+      <div class="card">
+        <div class="icon">📦</div>
+        <h3>Cages</h3>
+        <p>Each application runs as an isolated execution context with its own memory, control flow, and POSIX-like semantics — all inside one unprivileged host process.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🔀</div>
+        <h3>3i</h3>
+        <p>The Intercage Interposition Interface routes every system call, delegating each to the trusted runtime or to user-space policy handlers. Programmable, uniform across backends.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🛡️</div>
+        <h3>Grates</h3>
+        <p>User-space policy handlers that interpose on system calls — filter, transform, or service them entirely in user space, composable per workload.</p>
+      </div>
+      <div class="card">
+        <div class="icon">⚙️</div>
+        <h3>RawPOSIX</h3>
+        <p>A minimal trusted POSIX runtime that services the calls the policy layer chooses to pass through — keeping the trusted computing base small.</p>
+      </div>
+    </div>
+
+    <div class="grid cols-2">
+      <div class="card">
+        <div class="icon">🔌</div>
+        <h3>Pluggable isolation backends</h3>
+        <p>The isolation substrate is deliberately swappable. WebAssembly software fault isolation (via Wasmtime) is the first fully realized backend; hardware-assisted mechanisms such as Intel MPK and kernel backends are targeted next — each offering different performance and trust trade-offs, under the same mediation layer.</p>
+      </div>
+      <div class="card">
+        <div class="icon">🧩</div>
+        <h3>POSIX compatibility preserved</h3>
+        <p>Most C/POSIX programs — and increasingly Rust programs — can be recompiled and sandboxed without source-level changes. A full LAMP stack (NGINX, PostgreSQL, Python) already runs as cages today.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="projects" id="projects">
+    <div class="wrap">
+      <div class="kicker">Projects</div>
+      <h2 class="section-title">One framework, growing family of backends</h2>
+      <p class="section-lede">
+        lind-wasm is the mature, fully realized backend today — with end-to-end tests, benchmarks,
+        dev containers, and public documentation.
+      </p>
+
+      <div class="grid cols-2">
+        <a class="card project-card featured" href="https://lind-project.github.io/lind-wasm/" target="_blank" rel="noopener">
+          <div>
+            <span class="badge">★ Flagship — fully realized</span>
+            <h3 style="margin-top:14px">lind-wasm</h3>
+            <p style="margin-top:10px">
+              The WebAssembly backend, built on a modified Wasmtime and glibc. Runs a full LAMP
+              stack as isolated cages, with parts of the stack already mediated by grates. Ships
+              with dev containers, an end-to-end test suite, benchmarks, and docs.
+            </p>
+            <div class="project-links">
+              <span class="btn btn-dark small">Documentation ↗</span>
+              <span class="btn btn-light small">github.com/Lind-Project/lind-wasm</span>
+            </div>
+          </div>
+          <div class="stack-list" aria-hidden="true">
+            <div class="row"><span>NGINX</span><span class="ok">✓ runs as cage</span></div>
+            <div class="row"><span>PostgreSQL</span><span class="ok">✓ runs as cage</span></div>
+            <div class="row"><span>Python</span><span class="ok">✓ runs as cage</span></div>
+            <div class="row"><span>grate mediation</span><span class="ok">✓ partial stack</span></div>
+            <div class="row"><span>e2e tests · benchmarks</span><span class="ok">✓</span></div>
+          </div>
+        </a>
+
+        <a class="card project-card" href="https://github.com/Lind-Project/lind-wasm-example-grates" target="_blank" rel="noopener">
+          <span class="badge soft">Examples</span>
+          <h3 style="font-size:20px">lind-wasm-example-grates</h3>
+          <p>Example user-space policy handlers showing how grates interpose on and service system calls.</p>
+          <span class="mono">github.com/Lind-Project/lind-wasm-example-grates →</span>
+        </a>
+
+        <a class="card project-card" href="https://github.com/Lind-Project/lind-wasm-apps" target="_blank" rel="noopener">
+          <span class="badge soft">Applications</span>
+          <h3 style="font-size:20px">lind-wasm-apps</h3>
+          <p>Real-world POSIX applications ported to run as Lind cages — the compatibility test bed.</p>
+          <span class="mono">github.com/Lind-Project/lind-wasm-apps →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="roadmap">
+    <div class="kicker">Roadmap</div>
+    <h2 class="section-title">Validating the separation, then hardening it</h2>
+    <p class="section-lede">
+      The roadmap advances along two axes — new isolation backends, and deeper grate-based
+      mediation — with project maturity (governance, releases, audits) developing alongside.
+    </p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-when">M0 <span class="sub">current</span></div>
+        <div class="tl-body"><strong>WASM backend fully realized.</strong> Full LAMP stack runs as cages; parts run under grates. End-to-end tests, benchmarks, dev containers, docs. Backend interface being extracted.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">M1 <span class="sub">0–6 mo</span></div>
+        <div class="tl-body"><strong>First MPK and kernel backend prototypes</strong> run the core process model (cages, fork/exec/exit, multi-cage) through 3i. Grate mediation extends to the full LAMP stack; first tagged release.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">M2 <span class="sub">6–12 mo</span></div>
+        <div class="tl-body"><strong>Backend parity.</strong> MPK and kernel backends reach parity with WASM — including grate calls — so the LAMP stack runs across all three. Lind embeddable as a library.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">M3 <span class="sub">12–18 mo</span></div>
+        <div class="tl-body"><strong>Stabilize &amp; audit.</strong> Versioned backend, 3i, and grate interfaces; independent security audit; cross-backend performance optimization; supply-chain hardening.</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-when">M4 <span class="sub">18–24 mo</span></div>
+        <div class="tl-body"><strong>Production deployment</strong> at an external organization — real workloads with grate-based policy, across backends, with competitive performance.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cta-band">
+      <h2>Start with the realized backend</h2>
+      <p>lind-wasm is ready to explore today — documentation, dev containers, and a test suite to get you from clone to running cages.</p>
+      <div class="hero-cta">
+        <a class="btn btn-light" href="https://lind-project.github.io/lind-wasm/" target="_blank" rel="noopener">Read the docs ↗</a>
+        <a class="btn btn-light" href="https://github.com/Lind-Project/lind-wasm" target="_blank" rel="noopener">Clone the repo</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <div style="display:flex;align-items:center;gap:10px">
+        <img src="assets/lind-logo.png" alt="" aria-hidden="true" style="width:26px;height:26px;object-fit:contain">
+        © Lind Project — open source, unprivileged, POSIX-compatible sandboxing.
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/Lind-Project" target="_blank" rel="noopener">GitHub org</a>
+        <a href="https://github.com/Lind-Project/lind-wasm" target="_blank" rel="noopener">lind-wasm</a>
+        <a href="https://lind-project.github.io/lind-wasm/" target="_blank" rel="noopener">Documentation</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
 </html>
