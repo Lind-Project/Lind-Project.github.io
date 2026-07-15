@@ -71,24 +71,54 @@
       object-fit: contain;
       display: block;
     }
-    .nav-links {
+    .nav-center {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      padding: 5px;
+      box-shadow: 0 1px 2px rgba(60, 50, 30, 0.05);
+    }
+    .nav-center a {
+      padding: 8px 16px;
+      font-size: 14.5px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      border-radius: var(--radius-pill);
+      transition: background 0.12s ease, color 0.12s ease;
+    }
+    .nav-center a:hover { color: var(--ink); background: var(--bg-soft); }
+    .nav-actions {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .nav-links a.plain {
+    .gh-stars {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
       padding: 8px 14px;
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
       border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+      transition: border-color 0.12s ease, background 0.12s ease;
     }
-    .nav-links a.plain:hover { color: var(--ink); }
-    @media (max-width: 900px) {
-      .nav-links a.plain { display: none; }
+    .gh-stars:hover { background: var(--card); border-color: var(--line); }
+    .gh-stars .gh-icon { width: 17px; height: 17px; }
+    @media (max-width: 940px) {
+      .nav-inner { flex-wrap: wrap; row-gap: 12px; }
+      .nav-center { order: 3; flex-basis: 100%; justify-content: center; }
     }
-    @media (max-width: 480px) {
-      .nav-inner { flex-wrap: wrap; justify-content: center; gap: 10px; }
+    @media (max-width: 560px) {
+      .gh-stars { display: none; }
+      .nav-inner { padding: 14px 18px; }
+      .nav-actions { gap: 8px; }
+      .nav-center { flex-wrap: wrap; }
+      .nav-center a { padding: 8px 12px; font-size: 14px; }
     }
 
     .btn {
@@ -236,13 +266,29 @@
       margin-top: 44px;
     }
     .grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
     .grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
     @media (max-width: 900px) {
       .grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid.cols-3 { grid-template-columns: 1fr; }
     }
     @media (max-width: 600px) {
       .grid.cols-4, .grid.cols-2 { grid-template-columns: 1fr; }
     }
+
+    .community-card { display: flex; flex-direction: column; }
+    .community-card p { flex: 1; margin-bottom: 18px; }
+    .community-card .btn { align-self: flex-start; }
+    .community-card code {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 13px;
+      background: var(--bg-soft);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 1px 6px;
+    }
+    .cal-btn { display: inline-block; align-self: flex-start; }
+    .cal-btn img { display: block; border: 0; }
 
     .card {
       background: var(--card);
@@ -342,6 +388,50 @@
     .stack-list .row:last-child { border-bottom: none; }
     .stack-list .ok { color: #2f7a3d; font-weight: 700; }
 
+    /* ---------- Ongoing work ---------- */
+    .ongoing {
+      margin-top: 40px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 28px 30px;
+    }
+    .ongoing-label {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink-faint);
+      margin-bottom: 18px;
+    }
+    .ongoing-items {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 800px) { .ongoing-items { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .ongoing-items { grid-template-columns: 1fr; } }
+    .ongoing-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-soft);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .wip-dot {
+      flex: none;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #d98a2b;
+      box-shadow: 0 0 0 4px rgba(217, 138, 43, 0.14);
+    }
+
     /* ---------- Roadmap ---------- */
     .timeline {
       margin-top: 44px;
@@ -423,15 +513,21 @@
         <img src="assets/lind-logo.png" alt="Lind logo">
         Lind
       </a>
-      <div class="nav-links">
-        <a class="plain" href="#architecture">Architecture</a>
-        <a class="plain" href="#projects">Projects</a>
-        <a class="plain" href="#roadmap">Roadmap</a>
-        <a class="btn btn-light small" href="https://github.com/Lind-Project" target="_blank" rel="noopener">
+
+      <div class="nav-center">
+        <a href="#architecture">Architecture</a>
+        <a href="#projects">Projects</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#community">Community</a>
+      </div>
+
+      <div class="nav-actions">
+        <a class="gh-stars" href="https://github.com/Lind-Project/lind-wasm" target="_blank" rel="noopener" aria-label="Star lind-wasm on GitHub">
           <svg class="gh-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-          GitHub
+          <span id="gh-star-count">21</span>
         </a>
-        <a class="btn btn-dark small" href="https://lind-project.github.io/lind-wasm/" target="_blank" rel="noopener">Get started with lind-wasm</a>
+        <a class="btn btn-light small" href="https://lind-project.github.io/lind-wasm/" target="_blank" rel="noopener">Docs</a>
+        <a class="btn btn-dark small" href="https://lind-project.github.io/lind-wasm/" target="_blank" rel="noopener">Get started</a>
       </div>
     </div>
   </nav>
@@ -568,7 +664,7 @@
     </div>
   </section>
 
-  <section class="projects" id="projects">
+  <section class="projects" id="projects" style="padding-bottom: 108px">
     <div class="wrap">
       <div class="kicker">Projects</div>
       <h2 class="section-title">One framework, growing family of backends</h2>
@@ -615,6 +711,16 @@
           <span class="mono">github.com/Lind-Project/lind-wasm-apps →</span>
         </a>
       </div>
+
+      <div class="ongoing">
+        <div class="ongoing-label">Ongoing work</div>
+        <div class="ongoing-items">
+          <span class="ongoing-pill"><span class="wip-dot"></span>MPK backend</span>
+          <span class="ongoing-pill"><span class="wip-dot"></span>Kernel backend with 3i</span>
+          <span class="ongoing-pill"><span class="wip-dot"></span>Library decomposition</span>
+          <span class="ongoing-pill"><span class="wip-dot"></span>Run Lind as a shared library</span>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -650,6 +756,36 @@
     </div>
   </section>
 
+  <section class="wrap" id="community" style="padding-top: 108px">
+    <div class="kicker">Community</div>
+    <h2 class="section-title">Built in the open, together</h2>
+    <p class="section-lede">
+      Lind is developed openly by a community of researchers and contributors.
+      Join the conversation, come to a meeting, or open your first pull request.
+    </p>
+
+    <div class="grid cols-3">
+      <div class="card community-card">
+        <div class="icon">📅</div>
+        <h3>Monthly community meeting</h3>
+        <p>We meet once a month to discuss roadmap progress, design questions, and contributions. Everyone is welcome — add it to your calendar.</p>
+        <a class="cal-btn" target="_blank" rel="noopener" href="https://calendar.google.com/calendar/event?action=TEMPLATE&amp;tmeid=MzdmMTJ0MGNhZ3QzbThmdDdrZW1kNDBucmdfMjAyNjA3MTBUMTQwMDAwWiB5dzcwMTNAbnl1LmVkdQ&amp;tmsrc=yw7013%40nyu.edu&amp;scp=ALL"><img border="0" src="https://calendar.google.com/calendar/images/ext/gc_button1_en.gif" alt="Add to Google Calendar"></a>
+      </div>
+      <div class="card community-card">
+        <div class="icon">💬</div>
+        <h3>Chat on Slack</h3>
+        <p>Questions, ideas, or just curious? Find us in the <code>#lind</code> channel of the Secure Systems Lab Slack.</p>
+        <a class="btn btn-dark small" target="_blank" rel="noopener" href="https://secure-systems-lab.slack.com/archives/CBKAGSC9Z">Join us on Slack</a>
+      </div>
+      <div class="card community-card">
+        <div class="icon">🐙</div>
+        <h3>Contribute on GitHub</h3>
+        <p>Issues, discussions, and pull requests all happen in the open. Contributing guides and good first issues live in the repos.</p>
+        <a class="btn btn-light small" target="_blank" rel="noopener" href="https://github.com/Lind-Project/lind-wasm">Explore the repo</a>
+      </div>
+    </div>
+  </section>
+
   <div class="wrap">
     <div class="cta-band">
       <h2>Start with the realized backend</h2>
@@ -671,9 +807,26 @@
         <a href="https://github.com/Lind-Project" target="_blank" rel="noopener">GitHub org</a>
         <a href="https://github.com/Lind-Project/lind-wasm" target="_blank" rel="noopener">lind-wasm</a>
         <a href="https://lind-project.github.io/lind-wasm/" target="_blank" rel="noopener">Documentation</a>
+        <a href="https://secure-systems-lab.slack.com/archives/CBKAGSC9Z" target="_blank" rel="noopener">Slack</a>
       </div>
     </div>
   </footer>
+
+  <script>
+    // Live GitHub star count for the nav badge (falls back to the hardcoded value).
+    (function () {
+      var el = document.getElementById('gh-star-count');
+      if (!el) return;
+      fetch('https://api.github.com/repos/Lind-Project/lind-wasm')
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (!data || typeof data.stargazers_count !== 'number') return;
+          var n = data.stargazers_count;
+          el.textContent = n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k' : n;
+        })
+        .catch(function () { /* keep fallback */ });
+    })();
+  </script>
 
 </body>
 </html>
