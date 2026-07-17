@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lind — Safely run untrusted POSIX applications</title>
-  <meta name="description" content="Lind is a general framework for safely executing untrusted POSIX applications as isolated cages within a single unprivileged host process.">
+  <meta name="description" content="Lind is a general framework for safely executing untrusted POSIX applications as mutually isolated compartments within a single unprivileged host process.">
   <link rel="icon" type="image/png" href="assets/favicon.png">
   <style>
     :root {
@@ -517,6 +517,7 @@
       <div class="nav-center">
         <a href="#architecture">Architecture</a>
         <a href="#projects">Projects</a>
+        <a href="#platforms">Platforms</a>
         <a href="#roadmap">Roadmap</a>
         <a href="#community">Community</a>
       </div>
@@ -536,19 +537,19 @@
     <img class="hero-logo" src="assets/lind-logo.png" alt="" aria-hidden="true">
     <h1>Run untrusted POSIX applications, safely, in one process</h1>
     <p class="sub">
-      Lind executes untrusted POSIX applications as isolated <strong>cages</strong> inside a single
-      unprivileged host process — no kernel modifications, no elevated privileges — while keeping
+      Lind executes untrusted POSIX applications as mutually isolated <strong>compartments</strong> inside
+      a single unprivileged host process — no kernel modifications, no elevated privileges — while keeping
       the isolation mechanism pluggable and the system-call policy layer uniform.
     </p>
 
     <div class="chip-row">
-      <span class="chip"><span class="dot" style="background:#654ff0"></span>WebAssembly</span>
+      <span class="chip"><span class="dot" style="background:#654ff0"></span>WebAssembly / Wasmtime</span>
       <span class="chip-plus">/</span>
       <span class="chip"><span class="dot" style="background:#0068b5"></span>Intel MPK</span>
       <span class="chip-plus">/</span>
-      <span class="chip"><span class="dot" style="background:#2f7a3d"></span>Kernel backends</span>
+      <span class="chip"><span class="dot" style="background:#2f7a3d"></span>More backends</span>
       <span class="chip-plus">→</span>
-      <span class="chip">One mediation layer: 3i</span>
+      <span class="chip">One uniform mediation layer</span>
     </div>
 
     <div class="hero-cta">
@@ -556,38 +557,38 @@
       <a class="btn btn-light" href="https://github.com/Lind-Project/lind-wasm" target="_blank" rel="noopener">View on GitHub</a>
     </div>
 
-    <div class="hero-note">$ recompile · sandbox · run — most C/POSIX programs, unchanged</div>
+    <div class="hero-note">$ recompile · sandbox · run — most C, C++ &amp; Rust programs, unchanged</div>
   </header>
 
   <div class="arch" id="architecture">
     <div class="arch-frame">
-      <svg viewBox="0 0 860 392" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" role="img" aria-label="Lind architecture: cages and grates run inside a pluggable isolation backend that confines them; each cage sends system calls downward into 3i; grates exchange calls with 3i in both directions; 3i services calls through the trusted RawPOSIX runtime.">
-        <!-- Isolation backend: frame around cages & grates -->
+      <svg viewBox="0 0 860 392" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" role="img" aria-label="Lind architecture: compartments and policy handlers run inside a pluggable isolation backend that confines them; each compartment sends system calls downward into the mediation layer; policy handlers exchange calls with it in both directions; the mediation layer services calls through the trusted POSIX runtime.">
+        <!-- Isolation backend: frame around compartments & policy handlers -->
         <rect x="16" y="14" width="828" height="158" rx="18" fill="#efe9df" stroke="#d9d2c6"/>
-        <text x="34" y="39" font-size="11" font-weight="700" letter-spacing="0.06em" fill="#8a857c">PLUGGABLE ISOLATION BACKEND · CONFINES CAGES &amp; GRATES</text>
-        <text x="826" y="39" text-anchor="end" font-size="11" fill="#55524c">WebAssembly / Wasmtime ✓ · Intel MPK (planned) · Kernel (planned)</text>
+        <text x="34" y="39" font-size="11" font-weight="700" letter-spacing="0.06em" fill="#8a857c">PLUGGABLE ISOLATION BACKEND · CONFINES COMPARTMENTS &amp; HANDLERS</text>
+        <text x="826" y="39" text-anchor="end" font-size="11" fill="#55524c">WebAssembly / Wasmtime ✓ · Intel MPK &amp; more (planned)</text>
 
-        <!-- Cages (isolated, only downward arrows) -->
+        <!-- Compartments (isolated, only downward arrows) -->
         <g>
           <rect x="32" y="56" width="187" height="92" rx="13" fill="#fff" stroke="#e2dcd1"/>
-          <text x="125.5" y="96" text-anchor="middle" font-size="16.5" font-weight="700" fill="#1a1a1a">Cage 1</text>
+          <text x="125.5" y="96" text-anchor="middle" font-size="16.5" font-weight="700" fill="#1a1a1a">Compartment 1</text>
           <text x="125.5" y="120" text-anchor="middle" font-size="12.5" fill="#55524c">NGINX</text>
 
           <rect x="235" y="56" width="187" height="92" rx="13" fill="#fff" stroke="#e2dcd1"/>
-          <text x="328.5" y="96" text-anchor="middle" font-size="16.5" font-weight="700" fill="#1a1a1a">Cage 2</text>
+          <text x="328.5" y="96" text-anchor="middle" font-size="16.5" font-weight="700" fill="#1a1a1a">Compartment 2</text>
           <text x="328.5" y="120" text-anchor="middle" font-size="12.5" fill="#55524c">PostgreSQL</text>
 
           <rect x="438" y="56" width="187" height="92" rx="13" fill="#fff" stroke="#e2dcd1"/>
-          <text x="531.5" y="96" text-anchor="middle" font-size="16.5" font-weight="700" fill="#1a1a1a">Cage 3</text>
+          <text x="531.5" y="96" text-anchor="middle" font-size="16.5" font-weight="700" fill="#1a1a1a">Compartment 3</text>
           <text x="531.5" y="120" text-anchor="middle" font-size="12.5" fill="#55524c">Python</text>
         </g>
 
-        <!-- Grate (isolated, sits with the cages; exchanges calls with 3i) -->
+        <!-- Policy handler (isolated, sits with the compartments; exchanges calls with the mediation layer) -->
         <rect x="641" y="56" width="187" height="92" rx="13" fill="#fff" stroke="#c9a24b" stroke-width="1.6"/>
-        <text x="734.5" y="96" text-anchor="middle" font-size="16.5" font-weight="700" fill="#1a1a1a">Grate</text>
-        <text x="734.5" y="120" text-anchor="middle" font-size="12" fill="#55524c">user-space policy handler</text>
+        <text x="734.5" y="92" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">Policy handler</text>
+        <text x="734.5" y="118" text-anchor="middle" font-size="12" fill="#55524c">user-space, per workload</text>
 
-        <!-- Cages: system calls, only downward into 3i -->
+        <!-- Compartments: system calls, only downward into the mediation layer -->
         <g stroke="#8a857c" stroke-width="2" fill="none">
           <path d="M125.5 148 v60"/><path d="M328.5 148 v60"/><path d="M531.5 148 v60"/>
         </g>
@@ -596,7 +597,7 @@
         </g>
         <text x="430" y="184" text-anchor="middle" font-size="12" fill="#8a857c">system calls</text>
 
-        <!-- Grate ↔ 3i, both directions -->
+        <!-- Policy handler ↔ mediation layer, both directions -->
         <g stroke="#8a857c" stroke-width="2" fill="none">
           <path d="M722 148 v60"/><path d="M748 210 v-60"/>
         </g>
@@ -605,21 +606,21 @@
         </g>
         <text x="762" y="184" text-anchor="start" font-size="12" fill="#8a857c">mediation</text>
 
-        <!-- 3i -->
+        <!-- Mediation layer -->
         <rect x="16" y="212" width="828" height="64" rx="14" fill="#1a1a1a"/>
-        <text x="430" y="242" text-anchor="middle" font-size="15.5" font-weight="700" fill="#f5f1ea">3i — Intercage Interposition Interface</text>
-        <text x="430" y="262" text-anchor="middle" font-size="12" fill="#cfc9bd">uniform system-call mediation, routing &amp; policy</text>
+        <text x="430" y="242" text-anchor="middle" font-size="15.5" font-weight="700" fill="#f5f1ea">System-call mediation layer</text>
+        <text x="430" y="262" text-anchor="middle" font-size="12" fill="#cfc9bd">uniform interception, routing &amp; policy — same across backends</text>
 
-        <!-- 3i services calls via RawPOSIX -->
+        <!-- Mediation layer services calls via the trusted POSIX runtime -->
         <g stroke="#8a857c" stroke-width="2" fill="none">
           <path d="M430 276 v34"/>
         </g>
         <path d="M430 314 l-5 -8 h10 z" fill="#8a857c"/>
 
-        <!-- RawPOSIX (trusted) -->
+        <!-- Trusted POSIX runtime -->
         <rect x="16" y="316" width="828" height="60" rx="14" fill="#fff" stroke="#e2dcd1"/>
-        <text x="430" y="344" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">RawPOSIX</text>
-        <text x="430" y="363" text-anchor="middle" font-size="12" fill="#55524c">minimal trusted POSIX runtime</text>
+        <text x="430" y="344" text-anchor="middle" font-size="15" font-weight="700" fill="#1a1a1a">Trusted POSIX runtime</text>
+        <text x="430" y="363" text-anchor="middle" font-size="12" fill="#55524c">minimal, services the calls passed through to it</text>
       </svg>
     </div>
   </div>
@@ -636,23 +637,23 @@
     <div class="grid cols-4">
       <div class="card">
         <div class="icon">📦</div>
-        <h3>Cages</h3>
-        <p>Each application runs as an isolated execution context with its own memory, control flow, and POSIX-like semantics — all inside one unprivileged host process.</p>
+        <h3>Compartments</h3>
+        <p>Each application runs as its own isolated instance with its own memory, control flow, and POSIX behavior — all inside one unprivileged host process.</p>
       </div>
       <div class="card">
         <div class="icon">🔀</div>
-        <h3>3i</h3>
-        <p>The Intercage Interposition Interface routes every system call, delegating each to the trusted runtime or to user-space policy handlers. Programmable, uniform across backends.</p>
+        <h3>Mediation layer</h3>
+        <p>A single programmable layer routes every system call, delegating each to the trusted runtime or to user-space policy handlers. Uniform across every isolation backend.</p>
       </div>
       <div class="card">
         <div class="icon">🛡️</div>
-        <h3>Grates</h3>
-        <p>User-space policy handlers that interpose on system calls — filter, transform, or service them entirely in user space, composable per workload.</p>
+        <h3>Policy handlers</h3>
+        <p>User-space handlers that interpose on system calls — filter, transform, or service them entirely in user space, composable per workload.</p>
       </div>
       <div class="card">
         <div class="icon">⚙️</div>
-        <h3>RawPOSIX</h3>
-        <p>A minimal trusted POSIX runtime that services the calls the policy layer chooses to pass through — keeping the trusted computing base small.</p>
+        <h3>Trusted POSIX runtime</h3>
+        <p>A minimal runtime that services the calls the policy layer chooses to pass through — keeping the trusted computing base small.</p>
       </div>
     </div>
 
@@ -660,12 +661,12 @@
       <div class="card">
         <div class="icon">🔌</div>
         <h3>Pluggable isolation backends</h3>
-        <p>The isolation substrate is deliberately swappable. WebAssembly software fault isolation (via Wasmtime) is the first fully realized backend; hardware-assisted mechanisms such as Intel MPK and kernel backends are targeted next — each offering different performance and trust trade-offs, under the same mediation layer.</p>
+        <p>The isolation substrate is deliberately swappable. WebAssembly software fault isolation (via Wasmtime) is the only backend supported today; others are being added, including hardware-assisted options such as Intel Memory Protection Keys (MPK) — each offering different performance and trust trade-offs, under the same mediation layer.</p>
       </div>
       <div class="card">
         <div class="icon">🧩</div>
         <h3>POSIX compatibility preserved</h3>
-        <p>Most C/POSIX programs — and increasingly Rust programs — can be recompiled and sandboxed without source-level changes. A full LAMP stack (NGINX, PostgreSQL, Python) already runs as cages today.</p>
+        <p>Most C, C++, and Rust programs can be recompiled and sandboxed without source-code changes. A full LAMP stack (NGINX, PostgreSQL, Python) already runs as compartments today — natively on Linux, or via dev containers on Linux, macOS, and Windows.</p>
       </div>
     </div>
   </section>
@@ -686,8 +687,8 @@
             <h3 style="margin-top:14px">lind-wasm</h3>
             <p style="margin-top:10px">
               The WebAssembly backend, built on a modified Wasmtime and glibc. Runs a full LAMP
-              stack as isolated cages, with parts of the stack already mediated by grates. Ships
-              with dev containers, an end-to-end test suite, benchmarks, and docs.
+              stack as isolated compartments, with parts already served by user-space policy handlers.
+              Ships with dev containers, an end-to-end test suite, benchmarks, and docs.
             </p>
             <div class="project-links">
               <span class="btn btn-dark small">Documentation ↗</span>
@@ -695,10 +696,10 @@
             </div>
           </div>
           <div class="stack-list" aria-hidden="true">
-            <div class="row"><span>NGINX</span><span class="ok">✓ runs as cage</span></div>
-            <div class="row"><span>PostgreSQL</span><span class="ok">✓ runs as cage</span></div>
-            <div class="row"><span>Python</span><span class="ok">✓ runs as cage</span></div>
-            <div class="row"><span>grate mediation</span><span class="ok">✓ partial stack</span></div>
+            <div class="row"><span>NGINX</span><span class="ok">✓ runs as compartment</span></div>
+            <div class="row"><span>PostgreSQL</span><span class="ok">✓ runs as compartment</span></div>
+            <div class="row"><span>Python</span><span class="ok">✓ runs as compartment</span></div>
+            <div class="row"><span>policy-handler mediation</span><span class="ok">✓ partial stack</span></div>
             <div class="row"><span>e2e tests · benchmarks</span><span class="ok">✓</span></div>
           </div>
         </a>
@@ -706,14 +707,14 @@
         <a class="card project-card" href="https://github.com/Lind-Project/lind-wasm-example-grates" target="_blank" rel="noopener">
           <span class="badge soft">Examples</span>
           <h3 style="font-size:20px">lind-wasm-example-grates</h3>
-          <p>Example user-space policy handlers showing how grates interpose on and service system calls.</p>
+          <p>Example user-space policy handlers showing how they interpose on and service system calls.</p>
           <span class="mono">github.com/Lind-Project/lind-wasm-example-grates →</span>
         </a>
 
         <a class="card project-card" href="https://github.com/Lind-Project/lind-wasm-apps" target="_blank" rel="noopener">
           <span class="badge soft">Applications</span>
           <h3 style="font-size:20px">lind-wasm-apps</h3>
-          <p>Real-world POSIX applications ported to run as Lind cages — the compatibility test bed.</p>
+          <p>Real-world POSIX applications ported to run as Lind compartments — the compatibility test bed.</p>
           <span class="mono">github.com/Lind-Project/lind-wasm-apps →</span>
         </a>
       </div>
@@ -721,45 +722,53 @@
       <div class="ongoing">
         <div class="ongoing-label">Ongoing work</div>
         <div class="ongoing-items">
-          <span class="ongoing-pill"><span class="wip-dot"></span>MPK backend</span>
-          <span class="ongoing-pill"><span class="wip-dot"></span>Kernel backend with 3i</span>
-          <span class="ongoing-pill"><span class="wip-dot"></span>Library decomposition</span>
-          <span class="ongoing-pill"><span class="wip-dot"></span>Run Lind as a shared library</span>
+          <span class="ongoing-pill"><span class="wip-dot"></span>SGX enclave support</span>
+          <span class="ongoing-pill"><span class="wip-dot"></span>MPK &amp; kernel backends</span>
+          <span class="ongoing-pill"><span class="wip-dot"></span>Performance</span>
+          <span class="ongoing-pill"><span class="wip-dot"></span>Shared-object library</span>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="platforms" style="padding-bottom: 128px">
+    <div class="kicker">Where it runs</div>
+    <h2 class="section-title">Runs where you already work</h2>
+    <p class="section-lede">
+      lind-wasm runs today in a Docker development container on macOS, Windows, and Linux — and
+      natively on Linux for the lowest-overhead path from clone to running compartments.
+    </p>
+
+    <div class="grid cols-3">
+      <div class="card">
+        <div class="icon">🍎</div>
+        <h3>macOS</h3>
+        <p>Run the full build-and-test toolchain inside the Lind dev container — no host setup beyond Docker.</p>
+        <span class="mono">Docker dev container</span>
+      </div>
+      <div class="card">
+        <div class="icon">🪟</div>
+        <h3>Windows</h3>
+        <p>The same containerized workflow, so builds and tests behave identically across every machine.</p>
+        <span class="mono">Docker dev container</span>
+      </div>
+      <div class="card">
+        <div class="icon">🐧</div>
+        <h3>Linux</h3>
+        <p>Use the dev container for parity, or build and run Lind natively for the fastest, leanest setup.</p>
+        <span class="mono">Native · or Docker</span>
       </div>
     </div>
   </section>
 
   <section class="wrap" id="roadmap">
     <div class="kicker">Roadmap</div>
-    <h2 class="section-title">Validating the separation, then hardening it</h2>
+    <h2 class="section-title">Where Lind is headed next</h2>
     <p class="section-lede">
-      The roadmap advances along two axes — new isolation backends, and deeper grate-based
-      mediation — with project maturity (governance, releases, audits) developing alongside.
+      Lind moves toward a more portable, backend-independent framework — broadening where it
+      runs, validating the mediation layer across new software- and hardware-based isolation
+      mechanisms, improving performance, and hardening the shared-library mode.
     </p>
-
-    <div class="timeline">
-      <div class="tl-item">
-        <div class="tl-when">M0 <span class="sub">current</span></div>
-        <div class="tl-body"><strong>WASM backend fully realized.</strong> Full LAMP stack runs as cages; parts run under grates. End-to-end tests, benchmarks, dev containers, docs. Backend interface being extracted.</div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-when">M1 <span class="sub">0–6 mo</span></div>
-        <div class="tl-body"><strong>First MPK and kernel backend prototypes</strong> run the core process model (cages, fork/exec/exit, multi-cage) through 3i. Grate mediation extends to the full LAMP stack; first tagged release.</div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-when">M2 <span class="sub">6–12 mo</span></div>
-        <div class="tl-body"><strong>Backend parity.</strong> MPK and kernel backends reach parity with WASM — including grate calls — so the LAMP stack runs across all three. Lind embeddable as a library.</div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-when">M3 <span class="sub">12–18 mo</span></div>
-        <div class="tl-body"><strong>Stabilize &amp; audit.</strong> Versioned backend, 3i, and grate interfaces; independent security audit; cross-backend performance optimization; supply-chain hardening.</div>
-      </div>
-      <div class="tl-item">
-        <div class="tl-when">M4 <span class="sub">18–24 mo</span></div>
-        <div class="tl-body"><strong>Production deployment</strong> at an external organization — real workloads with grate-based policy, across backends, with competitive performance.</div>
-      </div>
-    </div>
   </section>
 
   <section class="wrap" id="community" style="padding-top: 108px">
@@ -795,7 +804,7 @@
   <div class="wrap">
     <div class="cta-band">
       <h2>Start with the realized backend</h2>
-      <p>lind-wasm is ready to explore today — documentation, dev containers, and a test suite to get you from clone to running cages.</p>
+      <p>lind-wasm is ready to explore today — documentation, dev containers, and a test suite to get you from clone to running compartments.</p>
       <div class="hero-cta">
         <a class="btn btn-light" href="https://lind-project.github.io/lind-wasm/" target="_blank" rel="noopener">Read the docs ↗</a>
         <a class="btn btn-light" href="https://github.com/Lind-Project/lind-wasm" target="_blank" rel="noopener">Clone the repo</a>
