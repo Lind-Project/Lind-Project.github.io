@@ -5,8 +5,8 @@ This repository hosts the organization-level landing page for the
 [lind-project.github.io](https://lind-project.github.io).
 
 The page introduces the Lind framework — safely executing untrusted POSIX
-applications as isolated cages within a single unprivileged host process —
-and links out to the realized backend and its documentation:
+applications as mutually isolated compartments within a single unprivileged
+host process — and links out to the realized backend and its documentation:
 
 - [lind-wasm documentation](https://lind-project.github.io/lind-wasm/)
   (assets in [lind-wasm/docs](https://github.com/Lind-Project/lind-wasm/tree/main/docs))
